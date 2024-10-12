@@ -46,3 +46,16 @@ def main():
      DiabetesPedigreeFunction = st.text_input('DiabetesPedigreeFunction')
      Age = st.text_input('Age')
     
+    # code for prediction
+    diagnosis = ''
+    
+    # creating a button for prediction 
+    
+    if st.button('Diabetes Test Result'):
+      diagnosis = diabetes_prediction([Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age])
+    
+    st.success(diagnosis)
+    
+    
+if__name__ == '__main__':
+   main()
