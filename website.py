@@ -2,31 +2,35 @@ import numpy as np
 import pickle
 import streamlit as st
 
+# Load the saved model and scaler
+with open('trained_model.sav', 'rb') as model_file:
+    scaler, loaded_model = pickle.load(model_file)
 
-# Loading the saved model using a relative path
-loaded_model = pickle.load(open('trained_model.sav', 'rb'))
-
-# creating a function for prediction
+# Function for diabetes prediction
 def diabetes_prediction(input_data):
-    # Changing input data to numpy array
+    # Convert input data to numpy array
     input_data_as_numpy_array = np.asarray(input_data)
 
     # Reshape the array as we are predicting for one instance
     input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
 
-    prediction = loaded_model.predict(input_data_reshaped)
-    
+    # Standardize the input data using the loaded scaler
+    std_data = scaler.transform(input_data_reshaped)
+
+    # Make the prediction using the loaded model
+    prediction = loaded_model.predict(std_data)
+
     if prediction[0] == 0:
         return 'not diabetic'
     else:
         return 'diabetic'
 
-# Main function for the app
+# Main function for the Streamlit app
 def main():
-    # Giving a title
+    # Title of the web app
     st.title('Diabetes Prediction Web App')
 
-    # Getting input data from the user
+    # Getting user input for the prediction
     Pregnancies = st.text_input('Number of Pregnancies')
     Glucose = st.text_input('Glucose Level')
     BloodPressure = st.text_input('Blood Pressure Value')
@@ -36,15 +40,22 @@ def main():
     DiabetesPedigreeFunction = st.text_input('Diabetes Pedigree Function')
     Age = st.text_input('Age')
 
-    # Code for prediction
+    # Placeholder for diagnosis result
     diagnosis = ''
 
-    # Creating a button for prediction
+    # Button to trigger prediction
     if st.button('Diabetes Test Result'):
-        diagnosis = diabetes_prediction([Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age])
+        # Convert user input to list of float values
+        input_data = [float(Pregnancies), float(Glucose), float(BloodPressure),
+                      float(SkinThickness), float(Insulin), float(BMI),
+                      float(DiabetesPedigreeFunction), float(Age)]
 
+        # Call the prediction function
+        diagnosis = diabetes_prediction(input_data)
+
+    # Display the result
     st.success(diagnosis)
 
-# Running the app
+# Run the app
 if __name__ == '__main__':
     main()
